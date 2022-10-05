@@ -381,7 +381,7 @@ constexpr bool is_map_v = !std::is_void_v<Mapped>;
 
 // clang-format off
 template <typename Hash, typename KeyEqual>
-constexpr bool is_transparent_v = is_detected_v<detect_is_transparent, Hash>&& is_detected_v<detect_is_transparent, KeyEqual>;
+constexpr bool is_transparent_v = is_detected_v<detect_is_transparent, Hash> && is_detected_v<detect_is_transparent, KeyEqual>;
 // clang-format on
 
 template <typename From, typename To1, typename To2>

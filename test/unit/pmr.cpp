@@ -147,12 +147,16 @@ void show([[maybe_unused]] track_peak_memory_resource const& mr, [[maybe_unused]
 // windows' vector has different allocation behavior
 #        ifndef _WIN32
 TEST_CASE("pmr_copy") {
+    using map_t = ankerl::unordered_dense::pmr::map<uint64_t, uint64_t>;
+    if (!std::is_same_v<std::vector<map_t::value_type>, map_t::value_container_type>) {
+        return;
+    }
     auto mr1 = track_peak_memory_resource();
-    auto map1 = ankerl::unordered_dense::pmr::map<uint64_t, uint64_t>(&mr1);
+    auto map1 = map_t(&mr1);
     map1[1] = 2;
 
     auto mr2 = track_peak_memory_resource();
-    auto map2 = ankerl::unordered_dense::pmr::map<uint64_t, uint64_t>(&mr2);
+    auto map2 = map_t(&mr2);
     map2[3] = 4;
     show(mr1, "mr1");
     show(mr2, "mr2");
@@ -173,12 +177,17 @@ TEST_CASE("pmr_copy") {
 }
 
 TEST_CASE("pmr_move_different_mr") {
+    using map_t = ankerl::unordered_dense::pmr::map<uint64_t, uint64_t>;
+    if (!std::is_same_v<std::vector<map_t::value_type>, map_t::value_container_type>) {
+        return;
+    }
+
     auto mr1 = track_peak_memory_resource();
-    auto map1 = ankerl::unordered_dense::pmr::map<uint64_t, uint64_t>(&mr1);
+    auto map1 = map_t(&mr1);
     map1[1] = 2;
 
     auto mr2 = track_peak_memory_resource();
-    auto map2 = ankerl::unordered_dense::pmr::map<uint64_t, uint64_t>(&mr2);
+    auto map2 = map_t(&mr2);
     map2[3] = 4;
     show(mr1, "mr1");
     show(mr2, "mr2");
@@ -199,8 +208,12 @@ TEST_CASE("pmr_move_different_mr") {
 }
 
 TEST_CASE("pmr_move_same_mr") {
+    using map_t = ankerl::unordered_dense::pmr::map<uint64_t, uint64_t>;
+    if (!std::is_same_v<std::vector<map_t::value_type>, map_t::value_container_type>) {
+        return;
+    }
     auto mr1 = track_peak_memory_resource();
-    auto map1 = ankerl::unordered_dense::pmr::map<uint64_t, uint64_t>(&mr1);
+    auto map1 = map_t(&mr1);
     map1[1] = 2;
     REQUIRE(mr1.num_allocs() == 2);
     REQUIRE(mr1.num_deallocs() == 0);
