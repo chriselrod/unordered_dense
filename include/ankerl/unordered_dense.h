@@ -74,6 +74,8 @@
 #    include <utility>          // for forward, exchange, pair, as_const, piece...
 #    include <vector>           // for vector
 
+#    include "segmented_vector.h"
+
 #    define ANKERL_UNORDERED_DENSE_PMR 0 // NOLINT(cppcoreguidelines-macro-usage)
 #    if defined(__has_include)
 #        if __has_include(<memory_resource>)
@@ -408,10 +410,11 @@ template <class Key,
           class Bucket>
 class table : public std::conditional_t<is_map_v<T>, base_table_type_map<T>, base_table_type_set> {
 public:
-    using value_container_type = std::conditional_t<
-        is_detected_v<detect_iterator, AllocatorOrContainer>,
-        AllocatorOrContainer,
-        typename std::vector<typename std::conditional_t<is_map_v<T>, std::pair<Key, T>, Key>, AllocatorOrContainer>>;
+    using value_container_type =
+        std::conditional_t<is_detected_v<detect_iterator, AllocatorOrContainer>,
+                           AllocatorOrContainer,
+                           typename ankerl::segmented_vector<typename std::conditional_t<is_map_v<T>, std::pair<Key, T>, Key>,
+                                                             AllocatorOrContainer>>;
 
 private:
     using bucket_alloc =
