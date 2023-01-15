@@ -1,7 +1,20 @@
 #pragma once
 
 #include <chrono>
+#include <limits>
 #include <vector>
+
+// Source: https://github.com/bitcoin/bitcoin/blob/master/src/memusage.h#L41-L61
+static inline auto malloc_usage(size_t alloc) -> size_t {
+    static_assert(sizeof(void*) == 8 || sizeof(void*) == 4);
+
+    // Measured on libc6 2.19 on Linux.
+    if constexpr (sizeof(void*) == 8U) {
+        return ((alloc + 31U) >> 4U) << 4U;
+    } else {
+        return ((alloc + 15U) >> 3U) << 3U;
+    }
+}
 
 class counts_for_allocator {
     struct measurement_internal {
@@ -34,7 +47,19 @@ public:
         auto total_bytes = size_t();
         auto const start_time = m_start;
         for (auto const& m : m_measurements) {
-            total_bytes += m.m_diff;
+            bool is_add = true;
+            size_t bytes = m.m_diff;
+            if (bytes > (0U - bytes)) {
+                // negative number
+                is_add = false;
+                bytes = 0U - bytes;
+            }
+
+            if (is_add) {
+                total_bytes += malloc_usage(bytes);
+            } else {
+                total_bytes -= malloc_usage(bytes);
+            }
             measurements.emplace_back(measurement{m.m_tp - start_time, total_bytes});
         }
         return measurements;
@@ -69,8 +94,12 @@ public:
     counting_allocator(counts_for_allocator* counts) noexcept // NOLINT(google-explicit-constructor,hicpp-explicit-conversions)
         : m_counts(counts) {}
 
+    /**
+     * Not explicit so we can easily construct it with the correct resource
+     */
     template <class U>
-    explicit counting_allocator(counting_allocator<U> const& other) noexcept
+    // NOLINTNEXTLINE(google-explicit-constructor,hicpp-explicit-conversions)
+    counting_allocator(counting_allocator<U> const& other) noexcept
         : m_counts(other.m_counts) {}
 
     counting_allocator(counting_allocator const& other) noexcept = default;
