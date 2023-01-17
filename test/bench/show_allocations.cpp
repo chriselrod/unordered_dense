@@ -1,4 +1,3 @@
-#include <ankerl/segmented_vector.h>
 #include <ankerl/unordered_dense.h> // for map, operator==
 
 #include <app/counting_allocator.h>
@@ -81,8 +80,8 @@ TEST_CASE("allocated_memory_std_deque" * doctest::skip()) {
 TEST_CASE("allocated_memory_segmented_vector" * doctest::skip()) {
     auto counters = counts_for_allocator{};
     {
-        using vec_t = ankerl::segmented_vector<pair_t, alloc_t>;
-        using map_t = ankerl::unordered_dense::map<uint64_t, uint64_t, hash_t, eq_t, vec_t>;
+        using vec_t = ankerl::unordered_dense::segmented_vector<pair_t, alloc_t>;
+        using map_t = ankerl::unordered_dense::segmented_map<uint64_t, uint64_t, hash_t, eq_t, vec_t>;
         auto map = map_t{0, hash_t{}, eq_t{}, alloc_t{&counters}};
         evaluate_map(map);
     }

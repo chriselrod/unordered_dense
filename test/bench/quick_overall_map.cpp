@@ -1,4 +1,3 @@
-#include <ankerl/segmented_vector.h>
 #include <ankerl/unordered_dense.h> // for map, hash
 
 #include <app/geomean.h>           // for geomean
@@ -230,12 +229,11 @@ TEST_CASE("bench_quick_overall_udm" * doctest::test_suite("bench") * doctest::sk
 TEST_CASE("bench_quick_overall_segmented_vector" * doctest::test_suite("bench") * doctest::skip()) {
     ankerl::nanobench::Bench bench;
     // bench.minEpochTime(1s);
-
-    using vec_t = ankerl::segmented_vector<pair_t>;
-    using map_t = ankerl::unordered_dense::map<uint64_t, size_t, hash_t, eq_t, vec_t>;
+    using vec_t = ankerl::unordered_dense::segmented_vector<pair_t>;
+    using map_t = ankerl::unordered_dense::segmented_map<uint64_t, size_t, hash_t, eq_t, vec_t>;
     bench_all<map_t>(&bench, "ankerl::unordered_dense::map<uint64_t, size_t> segmented_vector");
 
-    using vec_str_t = ankerl::segmented_vector<pair_str_t>;
+    using vec_str_t = ankerl::unordered_dense::segmented_vector<pair_str_t>;
     using map_str_t = ankerl::unordered_dense::map<std::string, size_t, hash_str_t, eq_str_t, vec_str_t>;
     bench_all<map_str_t>(&bench, "ankerl::unordered_dense::map<std::string, size_t> segmented_vector");
 
@@ -248,11 +246,11 @@ TEST_CASE("bench_quick_overall_deque" * doctest::test_suite("bench") * doctest::
 
     using vec_t = std::deque<pair_t>;
     using map_t = ankerl::unordered_dense::map<uint64_t, size_t, hash_t, eq_t, vec_t>;
-    bench_all<map_t>(&bench, "ankerl::unordered_dense::map<uint64_t, size_t> segmented_vector");
+    bench_all<map_t>(&bench, "ankerl::unordered_dense::map<uint64_t, size_t> deque");
 
     using vec_str_t = std::deque<pair_str_t>;
     using map_str_t = ankerl::unordered_dense::map<std::string, size_t, hash_str_t, eq_str_t, vec_str_t>;
-    bench_all<map_str_t>(&bench, "ankerl::unordered_dense::map<std::string, size_t> segmented_vector");
+    bench_all<map_str_t>(&bench, "ankerl::unordered_dense::map<std::string, size_t> deque");
 
     fmt::print("{} bench_quick_overall_deque\n", geomean1(bench));
 }
