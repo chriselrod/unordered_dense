@@ -462,8 +462,8 @@ private:
     size_t m_num_buckets = 0;
     size_t m_max_bucket_capacity = 0;
     float m_max_load_factor = default_max_load_factor;
-    Hash m_hash{};
-    KeyEqual m_equal{};
+    [[no_unique_address]] Hash m_hash{};
+    [[no_unique_address]] KeyEqual m_equal{};
     uint8_t m_shifts = initial_shifts;
 
     [[nodiscard]] auto next(value_idx_type bucket_idx) const -> value_idx_type {
